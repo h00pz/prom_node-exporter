@@ -1,0 +1,9 @@
+---
+- name: Setup prometheus config
+  template:
+    src: "prometheus.yml"
+    dest: "/etc/prometheus/prometheus.yml"
+    mode: 0644
+    owner: root
+    group: root
+  notify: Restart prometheus

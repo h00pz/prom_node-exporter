@@ -7,8 +7,11 @@ scrape_configs:
   - job_name: 'prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: ['{{ prom_server }}:9090']
+            - targets: ['localhost:9090','localhost:9100']
   - job_name: 'node_exporter'
     scrape_interval: 5s
     static_configs:
-      - targets: ['localhost:9100']
+            {% for host in groups.exporters|difference([inventory_hostname]) %}
+            - targets: ['host:9100']
+            {% endfor %}
+

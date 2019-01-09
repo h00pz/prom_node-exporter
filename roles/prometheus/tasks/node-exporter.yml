@@ -34,15 +34,6 @@
     remote_src: yes
     mode: 0755
 
-- name: Setup node_exporter config
-  template:
-    src: "prometheus.yml"
-    dest: "/etc/prometheus/prometheus.yml"
-    mode: 0644
-    owner: root
-    group: root
-  notify: Restart node_exporter
-
 - name: Setup node_exporter service
   template:
     src: "node_exporter.service"
