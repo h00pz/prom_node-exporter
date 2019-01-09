@@ -1,0 +1,36 @@
+---
+- name: Create prometheus group
+  group:
+    name: prometheus
+
+- name: Create prometheus user
+  user:
+    name: prometheus
+    group: prometheus
+    shell: "/sbin/nologin"
+
+- name: Create prometheus directory
+  file:
+    path: "/opt/prometheus"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: 0775
+
+- name: Create config directory
+  file:
+    path: "/etc/prometheus"
+    state: directory
+    owner: root
+    group: root
+
+- name: Install node-exporter
+  include: node-exporter.yml
+
+- name: Chown prometheus directory
+  file:
+    path: "/opt/prometheus"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    recurse: yes

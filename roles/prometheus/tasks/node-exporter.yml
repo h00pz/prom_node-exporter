@@ -1,0 +1,60 @@
+---
+- name: Set node_exporter_version
+  set_fact:
+    node_exporter_version: '0.17.0'
+
+- name: Set node_exporter download_url
+  set_fact:
+    node_exporter_package_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+
+- name: Create node_exporter textfile_collector directory
+  file:
+    path: "/var/lib/node_exporter"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: 0775
+
+- name: Download node_exporter release
+  get_url:
+    url: "{{ node_exporter_package_url }}"
+    dest: /opt/prometheus/node_exporter-v{{ node_exporter_version }}.tar.gz
+    checksum: sha256:d2e00d805dbfdc67e7291ce2d2ff151f758dd7401dd993411ff3818d0e231489
+
+- name: Unpack prometheus tarball
+  unarchive:
+    src: "/opt/prometheus/node_exporter-v{{ node_exporter_version }}.tar.gz"
+    dest: "/opt/prometheus"
+    copy: false
+
+- name: Move binary out of extracted dir
+  copy:
+    src: /opt/prometheus/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter
+    dest: /opt/prometheus/node_exporter
+    remote_src: yes
+    mode: 0755
+
+- name: Setup node_exporter config
+  template:
+    src: "prometheus.yml"
+    dest: "/etc/prometheus/prometheus.yml"
+    mode: 0644
+    owner: root
+    group: root
+  notify: Restart node_exporter
+
+- name: Setup node_exporter service
+  template:
+    src: "node_exporter.service"
+    dest: "/etc/systemd/system/node_exporter.service"
+  notify: Restart node_exporter
+
+- name: Reload changed systemd unit files
+  command: systemctl daemon-reload
+  notify: Restart node_exporter
+
+- name: Start & Enable node_exporter
+  service:
+    name: node_exporter
+    state: started
+    enabled: yes

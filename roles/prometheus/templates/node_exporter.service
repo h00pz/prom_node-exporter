@@ -1,0 +1,12 @@
+[Unit]
+Description=Provides a node_exporter endpoint for prometheus to query system metrics
+After=syslog.target network.target
+
+[Service]
+User=prometheus
+Group=prometheus
+ExecStart=/opt/prometheus/node_exporter \
+        --log.level info --collector.textfile.directory /var/lib/node_exporter
+
+[Install]
+WantedBy=multi-user.target
