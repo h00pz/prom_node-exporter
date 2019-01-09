@@ -11,7 +11,8 @@ scrape_configs:
   - job_name: 'node_exporter'
     scrape_interval: 5s
     static_configs:
-            {% for host in groups.exporters|difference([inventory_hostname]) %}
-            - targets: ['host:9100']
-            {% endfor %}
+     {% for host in groups['exporters'] %}
+     - targets: ['{{ hostvars[host]['ansible_default_ipv4']['address'] }}:9100']
+     {% endfor %}
+
 

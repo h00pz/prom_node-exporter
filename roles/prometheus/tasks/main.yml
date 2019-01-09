@@ -26,11 +26,11 @@
 
 - name: Update Prometheus Server targets list
   include: prometheus.yml
-  when: "'prometheus' in {{ group_names }}"
+  when: "'prometheus' in group_names"
 
 - name: Install node-exporter
   include: node-exporter.yml
-  when: "'exporters' in {{ group_names }}"
+  when: "'exporters' in group_names"
 
 - name: Chown prometheus directory
   file:
